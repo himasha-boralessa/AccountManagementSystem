@@ -14,6 +14,7 @@ spec:
     spec:
       containers:
       - name: client
-        image: gcr.io/consoleapp-1538806480615/client:latest
+        image: gcr.io/qwiklabs-gcp-00-f904cc3d7055/client:latest
       - name: accountmanager
-        image: gcr.io/consoleapp-1538806480615/accountmanager:latest
+        image: gcr.io/qwiklabs-gcp-00-f904cc3d7055/accountmanager:latest
+        
