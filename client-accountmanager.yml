@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-accountmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-accountmanager
+  template:
+    metadata:
+      labels:
+        app: client-accountmanager
+    spec:
+      containers:
+      - name: client
+        image: gcr.io/YOUR_PROJECT_ID/client:latest
+      - name: accountmanager
+        image: gcr.io/YOUR_PROJECT_ID/accountmanager:latest
