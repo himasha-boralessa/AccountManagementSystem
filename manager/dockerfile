@@ -1,8 +1,0 @@
-FROM golang:1.16
-
-WORKDIR /app
-COPY . .
-
-RUN go mod init accountmanager && go build -o accountmanager
-
-CMD ["./accountmanager"]

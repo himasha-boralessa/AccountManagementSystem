@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: client-account-manager-pod
+spec:
+  containers:
+  - name: account-manager
+    image: gcr.io/consoleapp-1538806480615/account-manager:latest
+    ports:
+    - containerPort: 8080
+  - name: client
+    image: gcr.io/consoleapp-1538806480615/client:latest
+    env:
+    - name: ACCOUNT_MANAGER_SERVICE_HOST
+      value: "localhost"
+    - name: ACCOUNT_MANAGER_SERVICE_PORT
+      value: "8080"
+    ports:
+    - containerPort: 8081
