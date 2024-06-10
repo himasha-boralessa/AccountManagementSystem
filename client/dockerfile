@@ -16,9 +16,6 @@ WORKDIR /app
 # Copy the source code into the container
 COPY . .
 
-# Download necessary Go packages (adjust based on your project needs)
-RUN go get ./...
-
 # Build the Go app
 RUN go build -o client
 
