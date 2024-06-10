@@ -1,0 +1,3 @@
+module containerized-accountmanager-app
+
+go 1.22.1

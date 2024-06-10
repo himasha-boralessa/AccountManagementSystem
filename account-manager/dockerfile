@@ -7,29 +7,18 @@
 
 # CMD ["./accountmanager"]
 # Use the official Golang image as the base image for the build stage
-FROM golang:1.20 as builder
+FROM golang:1.20
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
 # Copy the source code into the container
-COPY . .
+COPY go.mod .
+copy account-manager.go .
 
 # Build the Go app
 RUN go build -o account-manager
 
-# Use a minimal base image for the final stage
-FROM gcr.io/distroless/base-debian10
-
-# Set the Current Working Directory inside the container
-WORKDIR /app
-
-# Copy the binary from the builder stage
-COPY --from=builder /app/account-manager .
-
-# Expose port 8080 to the outside world
-EXPOSE 8080
-
 # Command to run the executable
-CMD ["./account-manager"]
+ENTRYPOINT ["/app/account-manager"]
 
