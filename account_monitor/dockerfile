@@ -1,8 +1,10 @@
-# Dockerfile for accounts monitor
+# Use the official Golang image as the base image for the build stage
 FROM golang:1.20
 
+# Set the Current Working Directory inside the container
 WORKDIR /app
 
+# Copy the source code into the container
 COPY go.mod .
 COPY accounts_monitor.go .
 
@@ -11,4 +13,3 @@ RUN go build -o accounts_monitor .
 
 # Command to run the executable
 ENTRYPOINT ["/app/accounts_monitor"]
-
