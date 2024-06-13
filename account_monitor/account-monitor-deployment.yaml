@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: accounts-monitor
-        image: gcr.io/your-project-id/account-monitor:latest
+        image: gcr.io/your-project-id/accounts-monitor:latest
         ports:
         - containerPort: 8081
 ---
