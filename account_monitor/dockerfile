@@ -5,8 +5,8 @@ WORKDIR /app
 
 COPY go.mod .
 COPY accounts_monitor.go .
-COPY view /app/view
 
+# Build the Go app
 RUN go build -o accounts_monitor .
 
 # Command to run the executable
