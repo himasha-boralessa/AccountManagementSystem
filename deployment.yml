@@ -15,11 +15,11 @@ spec:
     spec:
       containers:
       - name: client1
-        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/client:latest 
+        image: gcr.io/qwiklabs-gcp-03-71d6bd534353/client:latest 
       - name: client2
-        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/client:latest
+        image: gcr.io/qwiklabs-gcp-03-71d6bd534353/client:latest
       - name: account-manager
-        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/account-manager:latest
+        image: gcr.io/qwiklabs-gcp-03-71d6bd534353/account-manager:latest
         ports:
         - containerPort: 8080
 ---
@@ -40,6 +40,6 @@ spec:
     spec:
       containers:
       - name: accounts-monitor
-        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/accounts-monitor:latest
+        image: gcr.io/qwiklabs-gcp-03-71d6bd534353/accounts-monitor:latest
         ports:
         - containerPort: 8080
