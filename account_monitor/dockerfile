@@ -1,0 +1,14 @@
+# Dockerfile for accounts monitor
+FROM golang:1.20
+
+WORKDIR /app
+
+COPY go.mod .
+COPY accounts_monitor.go .
+COPY view /app/view
+
+RUN go build -o accounts_monitor .
+
+# Command to run the executable
+ENTRYPOINT ["/app/accounts_monitor"]
+

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accounts Monitor</title>
+    <script>
+        async function fetchAccounts() {
+            const response = await fetch('http://localhost:8081/accounts');
+            const accounts = await response.json();
+            const accountsList = document.getElementById('accounts');
+            accountsList.innerHTML = '';
+            for (const id in accounts) {
+                const account = accounts[id];
+                const accountItem = document.createElement('li');
+                accountItem.textContent = `Account ID: ${account.id}, Balance: ${account.balance}`;
+                accountsList.appendChild(accountItem);
+
+                const logsList = document.createElement('ul');
+                account.logs.forEach(log => {
+                    const logItem = document.createElement('li');
+                    logItem.textContent = log;
+                    logsList.appendChild(logItem);
+                });
+                accountsList.appendChild(logsList);
+            }
+        }
+
+        setInterval(fetchAccounts, 5000);
+    </script>
+</head>
+<body>
+    <h1>Accounts Monitor</h1>
+    <ul id="accounts"></ul>
+</body>
+</html>
