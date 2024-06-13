@@ -1,0 +1,44 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: account-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: account-system
+  template:
+    metadata:
+      labels:
+        app: account-system
+    spec:
+      containers:
+      - name: client1
+        image: client-image:latest
+      - name: client2
+        image: client-image:latest
+      - name: account-manager
+        image: account-manager-image:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accounts-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: accounts-monitor
+  template:
+    metadata:
+      labels:
+        app: accounts-monitor
+    spec:
+      containers:
+      - name: accounts-monitor
+        image: accounts-monitor-image:latest
+        ports:
+        - containerPort: 8080
