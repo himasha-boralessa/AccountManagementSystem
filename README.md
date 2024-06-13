@@ -4,15 +4,16 @@ Containerized application with Google Kubernetes Engine
 
 ```
  export my_cluster=cluster-1
- export zone= europe-west1-c
- export YOUR_PROJECT_ID = qwiklabs-gcp-00-459904d6b8d8
+ export zone=europe-west1-c
+ export YOUR_PROJECT_ID=qwiklabs-gcp-00-459904d6b8d8
 
  Push docker image to Google Container Registry (GCR)
  docker build -t gcr.io/$YOUR_PROJECT_ID/account-manager:latest .
  docker push gcr.io/$YOUR_PROJECT_ID/account-manager:latest
  docker build -t gcr.io/$YOUR_PROJECT_ID/client:latest .
  docker push gcr.io/$YOUR_PROJECT_ID/client:latest
-
+ docker build -t gcr.io/$YOUR_PROJECT_ID/accounts-manager:latest .
+ docker push gcr.io/$YOUR_PROJECT_ID/accounts-manager:latest
 
  gcloud container clusters create $my_cluster --num-nodes 3 --zone $zone --enable-ip-alias //add cluster
  gcloud container clusters create $my_cluster --zone $zone   //add cluster
