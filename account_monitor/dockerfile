@@ -6,7 +6,7 @@ WORKDIR /app
 
 # Copy the source code into the container
 COPY go.mod .
-COPY accounts_monitors.go .
+COPY accounts_monitor.go .
 
 # Build the Go app
 RUN go build -o accounts_monitor .
