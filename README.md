@@ -34,7 +34,8 @@ kubectl describe pod <podName> // view the complete details of the Pod
 kubectl get pods
 kubectl get deployments
 kubectl get services  //view details about services in the cluster
-kubectl logs <pod-name>
+kubectl logs <pod-name> -c account-manager
+curl http://localhost:8080/transaction?amount=84
 
 
 ```
