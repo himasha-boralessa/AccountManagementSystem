@@ -6,10 +6,10 @@ WORKDIR /app
 
 # Copy the source code into the container
 COPY go.mod .
-COPY accounts_monitor.go .
+COPY accounts-monitor.go .
 
 # Build the Go app
-RUN go build -o accounts_monitor .
+RUN go build -o accounts-monitor .
 
 # Command to run the executable
-ENTRYPOINT ["/app/accounts_monitor"]
+ENTRYPOINT ["/app/accounts-monitor"]
