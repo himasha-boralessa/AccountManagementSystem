@@ -2,30 +2,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: account-monitor
+  name: accounts-monitor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: account-monitor
+      app: accounts-monitor
   template:
     metadata:
       labels:
-        app: account-monitor
+        app: accounts-monitor
     spec:
       containers:
-      - name: account-monitor
-        image: gcr.io/your-project-id/account-monitor:latest
+      - name: accounts-monitor
+        image: gcr.io/qwiklabs-gcp-03-3aebcceaf19b/accounts-monitor:latest
         ports:
         - containerPort: 8081
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: account-monitor
+  name: accounts-monitor
 spec:
   selector:
-    app: account-monitor
+    app: accounts-monitor
   ports:
   - protocol: TCP
     port: 80
