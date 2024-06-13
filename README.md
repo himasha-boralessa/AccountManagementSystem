@@ -12,8 +12,8 @@ Containerized application with Google Kubernetes Engine
  docker push gcr.io/$YOUR_PROJECT_ID/account-manager:latest
  docker build -t gcr.io/$YOUR_PROJECT_ID/client:latest .
  docker push gcr.io/$YOUR_PROJECT_ID/client:latest
- docker build -t gcr.io/$YOUR_PROJECT_ID/accounts-manager:latest .
- docker push gcr.io/$YOUR_PROJECT_ID/accounts-manager:latest
+ docker build -t gcr.io/$YOUR_PROJECT_ID/accounts-monitor:latest .
+ docker push gcr.io/$YOUR_PROJECT_ID/accounts-monitor:latest
 
  gcloud container clusters create $my_cluster --num-nodes 3 --zone $zone --enable-ip-alias //add cluster
  gcloud container clusters create $my_cluster --zone $zone   //add cluster
