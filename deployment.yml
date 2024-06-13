@@ -15,11 +15,11 @@ spec:
     spec:
       containers:
       - name: client1
-        image: client-image:latest
+        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/client:latest 
       - name: client2
-        image: client-image:latest
+        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/client:latest
       - name: account-manager
-        image: account-manager-image:latest
+        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/account-manager:latest
         ports:
         - containerPort: 8080
 ---
@@ -33,12 +33,13 @@ spec:
     matchLabels:
       app: accounts-monitor
   template:
+  
     metadata:
       labels:
         app: accounts-monitor
     spec:
       containers:
       - name: accounts-monitor
-        image: accounts-monitor-image:latest
+        image: gcr.io/qwiklabs-gcp-04-2c135a352cf3/accounts-monitor:latest
         ports:
         - containerPort: 8080
