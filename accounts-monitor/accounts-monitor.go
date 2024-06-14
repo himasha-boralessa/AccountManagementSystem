@@ -106,7 +106,7 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 
 	response := map[string]interface{}{
 		"balance": balance,
-		"transaction": Transaction{
+		"transactions": Transaction{
 			Time:   time.Now().Format(time.RFC3339),
 			Amount: amount,
 		},
@@ -116,5 +116,6 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	http.HandleFunc("/transaction", handleTransaction)
+	http.Handle("/", http.FileServer(http.Dir("./public")))
 	log.Fatal(http.ListenAndServe(":8083", nil))
 }
