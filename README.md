@@ -23,6 +23,7 @@ Containerized application with Google Kubernetes Engine
 
 # Replace the placeholder in the deployment YAML files with the actual project ID
 sed "s/PROJECT_ID/${PROJECT_ID}/g" deployment.yml | kubectl apply -f -
+sed "s/PROJECT_ID/${PROJECT_ID}/g" accounts-monitor-deployment.yml | kubectl apply -f -
 
 kubectl describe pod <podName> // view the complete details of the Pod
 
