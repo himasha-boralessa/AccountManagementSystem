@@ -1,3 +1,4 @@
+# Clients and the account manager run in the same pod and communicate internally.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,40 +16,28 @@ spec:
       containers:
       - name: client1
         image: gcr.io/PROJECT_ID/client:latest
+        ports:
+        - containerPort: 8080
       - name: client2
         image: gcr.io/PROJECT_ID/client:latest
+        ports:
+        - containerPort: 8081
       - name: account-manager
         image: gcr.io/PROJECT_ID/account-manager:latest
         ports:
-        - containerPort: 8080
-      - name: accounts-monitor
-        image: gcr.io/PROJECT_ID/accounts-monitor:latest
-        ports:
-        - containerPort: 8081
-
+        - containerPort: 8082
+     
 ---
+# account-system-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
-  name: account-manager-service
+  name: account-system
 spec:
   selector:
     app: account-system
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 8080
+  - protocol: TCP
+    port: 80
+    targetPort: 8082  #  the account manager listens on port 8082
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: accounts-monitor-service
-spec:
-  selector:
-    app: account-system
-  ports:
-    - protocol: TCP
-      port: 8081
-      targetPort: 8081
-  type: LoadBalancer

@@ -65,7 +65,7 @@ func main() {
 	client := &http.Client{}
 	for {
 		amount := rand.Intn(200) - 100 // Random amount between -100 and +100
-		req, err := http.NewRequest("POST", "http://localhost:8080/transaction", nil)
+		req, err := http.NewRequest("POST", "http://localhost:8082/transaction", nil)
 		if err != nil {
 			fmt.Println("Error creating request:", err)
 			continue
