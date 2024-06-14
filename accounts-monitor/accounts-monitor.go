@@ -77,7 +77,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -93,24 +92,42 @@ type Transaction struct {
 }
 
 func handleTransaction(w http.ResponseWriter, r *http.Request) {
-	amountStr := r.URL.Query().Get("amount")
-	amount, err := strconv.Atoi(amountStr)
-	if err != nil {
-		http.Error(w, "Invalid amount", http.StatusBadRequest)
-		return
-	}
+	// amountStr := r.URL.Query().Get("amount")
+	// amount, err := strconv.Atoi(amountStr)
+	// if err != nil {
+	// 	http.Error(w, "Invalid amount", http.StatusBadRequest)
+	// 	return
+	// }
+	amount := 10000
+	balance := 500
 
 	mu.Lock()
 	balance += amount
 	mu.Unlock()
 
+	// response := map[string]interface{}{
+	// 	"balance": balance,
+	// 	"transactions": Transaction{
+	// 		Time:   time.Now().Format(time.RFC3339),
+	// 		Amount: amount,
+	// 	},
+	// }
+
 	response := map[string]interface{}{
 		"balance": balance,
-		"transactions": Transaction{
-			Time:   time.Now().Format(time.RFC3339),
-			Amount: amount,
+		"transactions": []Transaction{
+			{
+				Time:   time.Now().Format(time.RFC3339),
+				Amount: 500000},
+			{
+				Time:   time.Now().Format(time.RFC3339),
+				Amount: 60000000},
+			{
+				Time:   time.Now().Format(time.RFC3339),
+				Amount: 800000},
 		},
 	}
+
 	json.NewEncoder(w).Encode(response)
 }
 
