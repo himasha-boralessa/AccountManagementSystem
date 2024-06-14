@@ -1,7 +1,0 @@
-# configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: project-config
-data:
-  PROJECT_ID: your-project-id
