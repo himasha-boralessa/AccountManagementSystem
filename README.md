@@ -5,7 +5,7 @@ Containerized application with Google Kubernetes Engine
 ```
  export my_cluster=cluster-1
  export zone=europe-west1-c
- export YOUR_PROJECT_ID=qwiklabs-gcp-00-459904d6b8d8
+ export YOUR_PROJECT_ID= <projectId>
 
  Push docker image to Google Container Registry (GCR)
  docker build -t gcr.io/$YOUR_PROJECT_ID/account-manager:latest .
