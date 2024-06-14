@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
   
   async function fetchTransactions() {
     try {
-      const response = await fetch('http://localhost:3001/transactions');
+      const response = await fetch('http://localhost:8083/transaction');
       const data = await response.json();
       displayTransactions(data.transactions);
       displayBalance(data.balance);
