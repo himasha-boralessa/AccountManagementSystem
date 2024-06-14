@@ -1,4 +1,5 @@
 # Accounts Monitor runs in a separate deployment and is exposed to the external world.
+# it is reachable from outside
 apiVersion: apps/v1
 kind: Deployment
 metadata:
