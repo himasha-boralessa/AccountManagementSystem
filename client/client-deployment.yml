@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: client
-        image: gcr.io/qwiklabs-gcp-00-459904d6b8d8/client:latest
+        image: gcr.io/$(PROJECT_ID)/client:latest
         env:
         - name: ACCOUNT_MANAGER_SERVICE_HOST
           value: "account-manager-service"

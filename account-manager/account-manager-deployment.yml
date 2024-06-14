@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: account-manager
-        image: gcr.io/qwiklabs-gcp-03-3aebcceaf19b/account-manager:latest
+        image: gcr.io/$(PROJECT_ID)/account-manager:latest
         ports:
         - containerPort: 8080

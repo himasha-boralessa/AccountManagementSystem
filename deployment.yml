@@ -14,17 +14,23 @@ spec:
     spec:
       containers:
       - name: client1
-        image: gcr.io/qwiklabs-gcp-02-8d8366c6a4b1/client:latest
+        image: gcr.io/$(PROJECT_ID)/client:latest
       - name: client2
-        image: gcr.io/qwiklabs-gcp-02-8d8366c6a4b1/client:latest
+        image: gcr.io/$(PROJECT_ID)/client:latest
       - name: account-manager
-        image: gcr.io/qwiklabs-gcp-02-8d8366c6a4b1/account-manager:latest
+        image: gcr.io/$(PROJECT_ID)/account-manager:latest
         ports:
         - containerPort: 8080
       - name: accounts-monitor
-        image: gcr.io/qwiklabs-gcp-02-8d8366c6a4b1/accounts-monitor:latest
+        image: gcr.io/$(PROJECT_ID)/accounts-monitor:latest
         ports:
         - containerPort: 8081
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: project-config
+              key: PROJECT_ID
 
 ---
 apiVersion: v1
