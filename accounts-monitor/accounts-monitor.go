@@ -1,76 +1,3 @@
-// // accounts_monitor.go
-// package main
-
-// import (
-// 	"encoding/json"
-// 	"fmt"
-// 	"log"
-// 	"net/http"
-// 	"sync"
-// 	"time"
-// )
-
-// type AccountStatus struct {
-// 	Balance float64  `json:"balance"`
-// 	Logs    []string `json:"logs"`
-// }
-
-// type AccountsMonitor struct {
-// 	mu       sync.Mutex
-// 	accounts map[string]AccountStatus
-// }
-
-// func (am *AccountsMonitor) updateAccounts() {
-// 	// Assuming the account manager is running on account-manager:8080
-// 	urls := []string{"http://account-manager-1:8080/logs", "http://account-manager-2:8080/logs"}
-
-// 	for _, url := range urls {
-// 		resp, err := http.Get(url)
-// 		if err != nil {
-// 			fmt.Println("Error fetching logs:", err)
-// 			continue
-// 		}
-// 		defer resp.Body.Close()
-
-// 		var logs []string
-// 		if err := json.NewDecoder(resp.Body).Decode(&logs); err != nil {
-// 			fmt.Println("Error decoding logs:", err)
-// 			continue
-// 		}
-
-// 		balance := 0.0
-// 		for _, logEntry := range logs {
-// 			// Simple parsing to extract balance from logs
-// 			fmt.Sscanf(logEntry, "%*s - Transaction: %*f, New Balance: %f", &balance)
-// 		}
-
-// 		am.mu.Lock()
-// 		am.accounts[url] = AccountStatus{Balance: balance, Logs: logs}
-// 		am.mu.Unlock()
-// 	}
-// }
-
-// func (am *AccountsMonitor) handleStatus(w http.ResponseWriter, r *http.Request) {
-// 	am.mu.Lock()
-// 	defer am.mu.Unlock()
-
-// 	json.NewEncoder(w).Encode(am.accounts)
-// }
-
-// func main() {
-// 	monitor := &AccountsMonitor{accounts: make(map[string]AccountStatus)}
-
-// 	go func() {
-// 		for {
-// 			monitor.updateAccounts()
-// 			time.Sleep(10 * time.Second)
-// 		}
-// 	}()
-
-// 	http.HandleFunc("/status", monitor.handleStatus)
-// 	log.Fatal(http.ListenAndServe(":8080", nil))
-// }
-
 package main
 
 import (
@@ -78,12 +5,6 @@ import (
 	"log"
 	"net/http"
 	"sync"
-	"time"
-)
-
-var (
-	balance int
-	mu      sync.Mutex
 )
 
 type Transaction struct {
@@ -91,48 +12,35 @@ type Transaction struct {
 	Amount int    `json:"amount"`
 }
 
-func handleTransaction(w http.ResponseWriter, r *http.Request) {
-	// amountStr := r.URL.Query().Get("amount")
-	// amount, err := strconv.Atoi(amountStr)
-	// if err != nil {
-	// 	http.Error(w, "Invalid amount", http.StatusBadRequest)
-	// 	return
-	// }
-	amount := 10000
-	balance := 500
+type Account struct {
+	Balance      int           `json:"balance"`
+	Transactions []Transaction `json:"transactions"`
+}
 
-	mu.Lock()
-	balance += amount
-	mu.Unlock()
+var (
+	mu sync.Mutex
+)
 
-	// response := map[string]interface{}{
-	// 	"balance": balance,
-	// 	"transactions": Transaction{
-	// 		Time:   time.Now().Format(time.RFC3339),
-	// 		Amount: amount,
-	// 	},
-	// }
+func getTransactions(w http.ResponseWriter, r *http.Request) {
+	resp, err := http.Get("http://account-system:8082/transactions")
+	if err != nil {
+		http.Error(w, "Failed to fetch transactions", http.StatusInternalServerError)
+		return
+	}
+	defer resp.Body.Close()
 
-	response := map[string]interface{}{
-		"balance": balance,
-		"transactions": []Transaction{
-			{
-				Time:   time.Now().Format(time.RFC3339),
-				Amount: 500000},
-			{
-				Time:   time.Now().Format(time.RFC3339),
-				Amount: 60000000},
-			{
-				Time:   time.Now().Format(time.RFC3339),
-				Amount: 800000},
-		},
+	var account Account
+	if err := json.NewDecoder(resp.Body).Decode(&account); err != nil {
+		http.Error(w, "Failed to decode transactions", http.StatusInternalServerError)
+		return
 	}
 
-	json.NewEncoder(w).Encode(response)
+	mu.Lock()
+	defer mu.Unlock()
+	json.NewEncoder(w).Encode(account)
 }
 
 func main() {
-	http.HandleFunc("/transaction", handleTransaction)
-	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.HandleFunc("/transactions", getTransactions)
 	log.Fatal(http.ListenAndServe(":8083", nil))
 }

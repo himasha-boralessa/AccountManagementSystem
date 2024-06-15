@@ -1,89 +1,77 @@
-// package main
-
-// import (
-// 	"encoding/json"
-// 	"fmt"
-// 	"log"
-// 	"net/http"
-// 	"os"
-// 	"sync"
-// 	"time"
-// )
-
-// type TransactionRequest struct {
-// 	Amount float64 `json:"amount"`
-// }
-
-// type AccountManager struct {
-// 	balance float64
-// 	mu      sync.Mutex
-// 	logFile *os.File
-// }
-
-// func NewAccountManager(logFilePath string) (*AccountManager, error) {
-// 	// file, err := os.OpenFile(logFilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-// 	// if err != nil {
-// 	// 	return nil, err
-// 	// }
-
-// 	return &AccountManager{
-// 		balance: 0,
-// 		// logFile: file,
-// 	}, nil
-// }
-
-// func (am *AccountManager) handleTransaction(w http.ResponseWriter, r *http.Request) {
-// 	var req TransactionRequest
-
-// 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-// 		http.Error(w, "Invalid request body", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	am.mu.Lock()
-// 	defer am.mu.Unlock()
-
-// 	am.balance += req.Amount
-// 	logEntry := fmt.Sprintf("%s - Transaction: %.2f, New Balance: %.2f\n", time.Now().Format(time.RFC3339), req.Amount, am.balance)
-// 	if _, err := am.logFile.WriteString(logEntry); err != nil {
-// 		http.Error(w, "Failed to log transaction", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	w.WriteHeader(http.StatusOK)
-// }
-
-// func (am *AccountManager) Start() {
-// 	http.HandleFunc("/transaction", am.handleTransaction)
-// 	log.Fatal(http.ListenAndServe(":8080", nil))
-// }
-
-// func main() {
-// 	accountManager, _ := NewAccountManager("/var/log/account_manager.log")
-// 	// if err != nil {
-// 	// 	log.Fatalf("Failed to create account manager: %v", err)
-// 	// }
-// 	// defer accountManager.logFile.Close()
-
-// 	fmt.Println("Account manager started")
-// 	accountManager.Start()
-// }
-
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 	"time"
 )
 
+const storagePath = "/app/storage"
+
+func saveJSONToFile(jsonData, filename string) error {
+	filePath := storagePath + "/" + filename
+	return ioutil.WriteFile(filePath, []byte(jsonData), 0644)
+}
+
+func readJSONFromFile(filename string) (string, error) {
+	filePath := storagePath + "/" + filename
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return "", nil // Or return an error or default value
+	}
+	data, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+type Transaction struct {
+	Time   string `json:"time"`
+	Amount int    `json:"amount"`
+}
+
+type Account struct {
+	Balance      int           `json:"balance"`
+	Transactions []Transaction `json:"transactions"`
+}
+
 var (
-	balance int
-	mu      sync.Mutex
+	accountFile = "account.json"
+	account     = Account{
+		Balance:      0,
+		Transactions: []Transaction{},
+	}
+	mu sync.Mutex
 )
+
+func loadAccount() {
+	data, err := readJSONFromFile(accountFile)
+	if err != nil {
+		log.Fatalf("Failed to read account file: %v", err)
+	}
+	if data != "" {
+		err = json.Unmarshal([]byte(data), &account)
+		if err != nil {
+			log.Fatalf("Failed to parse account file: %v", err)
+		}
+	}
+}
+
+func saveAccount() {
+	data, err := json.MarshalIndent(account, "", "  ")
+	if err != nil {
+		log.Fatalf("Failed to serialize account: %v", err)
+	}
+	err = saveJSONToFile(string(data), accountFile)
+	if err != nil {
+		log.Fatalf("Failed to write account file: %v", err)
+	}
+}
 
 func handleTransaction(w http.ResponseWriter, r *http.Request) {
 	amountStr := r.URL.Query().Get("amount")
@@ -94,14 +82,32 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	mu.Lock()
-	defer mu.Unlock()
-	balance += amount
+	account.Balance += amount
+	transaction := Transaction{
+		Time:   time.Now().Format(time.RFC3339),
+		Amount: amount,
+	}
+	account.Transactions = append(account.Transactions, transaction)
+	saveAccount()
+	mu.Unlock()
 
-	log.Printf("%s: Transaction of %d, new balance: %d\n", time.Now().Format(time.RFC3339), amount, balance)
-	fmt.Fprintf(w, "Transaction successful, new balance: %d", balance)
+	response := map[string]interface{}{
+		"balance":      account.Balance,
+		"transactions": account.Transactions,
+	}
+	json.NewEncoder(w).Encode(response)
+}
+
+func getTransactions(w http.ResponseWriter, r *http.Request) {
+	mu.Lock()
+	defer mu.Unlock()
+	json.NewEncoder(w).Encode(account)
 }
 
 func main() {
+	loadAccount()
+
 	http.HandleFunc("/transaction", handleTransaction)
+	http.HandleFunc("/transactions", getTransactions)
 	log.Fatal(http.ListenAndServe(":8082", nil))
 }
