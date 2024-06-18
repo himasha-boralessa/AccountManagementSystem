@@ -19,27 +19,28 @@ spec:
         ports:
         - containerPort: 8080
         env:
-            - name: CLIENT_ID
-              value: client1  # Unique identifier for client1
+        - name: CLIENT_ID
+          value: client1  # Unique identifier for client1
       - name: client2
         image: gcr.io/PROJECT_ID/client:latest
         ports:
         - containerPort: 8081
-         env:
-            - name: CLIENT_ID
-              value: client2  # Unique identifier for client2
+        env:
+        - name: CLIENT_ID
+          value: client2  # Unique identifier for client2
       - name: account-manager
         image: gcr.io/PROJECT_ID/account-manager:latest
         ports:
         - containerPort: 8082
-      #   volumeMounts:
-      #   - mountPath: /app/storage # Mount path in the container
-      #     name: account-storage
+      # Uncomment and adjust the following lines if you need to mount volumes
+      # volumeMounts:
+      # - mountPath: /app/storage # Mount path in the container
+      #   name: account-storage
       # volumes:
       # - name: account-storage
       #   persistentVolumeClaim:
       #     claimName: account-pvc  # Name of the PVC
-     
+
 ---
 # account-system-service.yaml
 apiVersion: v1
@@ -52,5 +53,4 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    targetPort: 8082  #  the account manager listens on port 8082
-
+    targetPort: 8082  # the account manager listens on port 8082
