@@ -1,8 +1,9 @@
 # DistributedAccountManagementSystem
 Containerized application with Google Kubernetes Engine
 
-#gcloud config set project <projectId>
+
 ```
+#gcloud config set project <projectId>
  export my_cluster=cluster-1
  export zone=europe-west1-c
  export PROJECT_ID=<projectId>
