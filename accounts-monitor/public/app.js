@@ -18,12 +18,15 @@ document.addEventListener('DOMContentLoaded', (event) => {
     transactionList.innerHTML = ''; // Clear any existing content
     transactions.forEach(transaction => {
         const row = document.createElement('tr');
+        const clientCell = document.createElement('td');
         const amountCell = document.createElement('td');
         const balanceCell = document.createElement('td');
         
+        clientCell.textContent = transaction.client_id;
         amountCell.textContent = transaction.amount;
         balanceCell.textContent = transaction.balance;
         
+        row.appendChild(clientCell);
         row.appendChild(amountCell);
         row.appendChild(balanceCell);
 

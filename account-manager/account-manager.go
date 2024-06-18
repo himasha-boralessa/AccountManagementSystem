@@ -53,9 +53,10 @@ var (
 )
 
 type Transaction struct {
-	Time    string `json:"time"`
-	Amount  int    `json:"amount"`
-	Balance int    `json:"balance"`
+	Time     string `json:"time"`
+	Amount   int    `json:"amount"`
+	Balance  int    `json:"balance"`
+	ClientID string `json:"client_id"`
 }
 
 // const dataFilePath = "/app/account-data/account.txt"
@@ -69,19 +70,27 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Retrieve Client-ID from header
+	clientID := r.Header.Get("Client-ID")
+	if clientID == "" {
+		http.Error(w, "Client-ID header missing", http.StatusBadRequest)
+		return
+	}
+
 	mu.Lock()
 	defer mu.Unlock()
 
 	balance += amount
 	transaction := Transaction{
-		Time:    time.Now().Format(time.RFC3339),
-		Amount:  amount,
-		Balance: balance,
+		Time:     time.Now().Format(time.RFC3339),
+		Amount:   amount,
+		Balance:  balance,
+		ClientID: clientID,
 	}
 
 	appendTransactionToFile(transaction)
 
-	log.Printf("Transaction of %d, new balance: %d\n", amount, balance)
+	log.Printf("Transaction of %d, new balance: %d, Client-ID: %s\n", amount, balance, clientID)
 	// json.NewEncoder(w).Encode(map[string]interface{}{
 	// 	"balance":     balance,
 	// 	"transaction": transaction,

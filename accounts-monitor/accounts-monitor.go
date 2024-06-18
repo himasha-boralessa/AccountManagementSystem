@@ -57,9 +57,9 @@ import (
 )
 
 type Transaction struct {
-	Time    string `json:"time"`
-	Amount  int    `json:"amount"`
-	Balance int    `json:"balance"`
+	Amount   int    `json:"amount"`
+	Balance  int    `json:"balance"`
+	ClientID string `json:"client_id"`
 }
 
 type AccountData struct {

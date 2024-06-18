@@ -18,10 +18,16 @@ spec:
         image: gcr.io/PROJECT_ID/client:latest
         ports:
         - containerPort: 8080
+        env:
+            - name: CLIENT_ID
+              value: client1  # Unique identifier for client1
       - name: client2
         image: gcr.io/PROJECT_ID/client:latest
         ports:
         - containerPort: 8081
+         env:
+            - name: CLIENT_ID
+              value: client2  # Unique identifier for client2
       - name: account-manager
         image: gcr.io/PROJECT_ID/account-manager:latest
         ports:
