@@ -22,8 +22,6 @@ Containerized application with Google Kubernetes Engine
  gcloud container clusters get-credentials $my_cluster --zone $zone  //to allow authentication
  kubectl cluster-info  //the cluster information
 
-kubectl apply -f persistent-volume-claim.yaml
-# Replace the placeholder in the below deployment commands with the actual project ID
 sed "s/PROJECT_ID/${PROJECT_ID}/g" deployment.yml | kubectl apply -f -
 sed "s/PROJECT_ID/${PROJECT_ID}/g" accounts-monitor-deployment.yml | kubectl apply -f -
 
@@ -33,13 +31,6 @@ kubectl get pods
 kubectl get deployments
 kubectl get services  //view details about services in the cluster
 kubectl logs <pod-name> -c <container-name>
-
-#pvc
-source <(kubectl completion bash)
-kubectl apply -f persistent-volume-claim.yaml
-kubectl get persistentvolumeclaim
-kubectl apply -f pod-volume-demo.yaml
-kubectl get pods
 
 
 
