@@ -3,6 +3,7 @@ Containerized application with Google Kubernetes Engine
 
 
 ```
+#gcloud config set project <projectId>
  export my_cluster=cluster-1
  export zone=europe-west1-c
  export PROJECT_ID=<projectId>
@@ -32,6 +33,15 @@ kubectl get pods
 kubectl get deployments
 kubectl get services  //view details about services in the cluster
 kubectl logs <pod-name> -c <container-name>
+
+#pvc
+source <(kubectl completion bash)
+kubectl apply -f persistent-volume-claim.yaml
+kubectl get persistentvolumeclaim
+kubectl apply -f pod-volume-demo.yaml
+kubectl get pods
+
+
 
 
 ```
