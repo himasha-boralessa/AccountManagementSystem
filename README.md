@@ -34,5 +34,7 @@ kubectl get deployments
 kubectl get services  //view details about services in the cluster
 kubectl logs <pod-name> -c <container-name>
 
+source <(kubectl completion bash)
+kubectl apply -f pvc-demo.yaml --validate=false
 
 ```
