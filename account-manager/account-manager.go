@@ -49,7 +49,9 @@ import (
 )
 
 var (
-	mu sync.Mutex
+	mu       sync.Mutex
+	balance1 int
+	balance2 int
 )
 
 type Transaction struct {
@@ -80,17 +82,25 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	balance := calculateBalance(clientID)
+	// balance := calculateBalance(clientID)
 	transaction := Transaction{
 		Time:     time.Now().Format(time.RFC3339),
 		Amount:   amount,
-		Balance:  balance,
 		ClientID: clientID,
+	}
+
+	if clientID == "client1" {
+		balance1 += transaction.Amount
+		transaction.Balance = balance1
+	}
+	if clientID == "client2" {
+		balance2 += transaction.Amount
+		transaction.Balance = balance2
 	}
 
 	appendTransactionToFile(transaction)
 
-	log.Printf("Transaction of %d, new balance: %d, Client-ID: %s\n", amount, balance, clientID)
+	log.Printf("Transaction of %d, new balance: %d, Client-ID: %s\n", amount, transaction.Balance, clientID)
 	// json.NewEncoder(w).Encode(map[string]interface{}{
 	// 	"balance":     balance,
 	// 	"transaction": transaction,
