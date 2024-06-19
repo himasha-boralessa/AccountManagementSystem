@@ -48,8 +48,7 @@ import (
 )
 
 var (
-	balance int
-	mu      sync.Mutex
+	mu sync.Mutex
 )
 
 type Transaction struct {
@@ -80,13 +79,12 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	balance += amount
 	transaction := Transaction{
 		Time:     time.Now().Format(time.RFC3339),
 		Amount:   amount,
-		Balance:  balance,
 		ClientID: clientID,
 	}
+	transaction.Balance += amount
 
 	appendTransactionToFile(transaction)
 
