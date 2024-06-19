@@ -38,6 +38,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -79,12 +80,13 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
+	balance := calculateBalance(clientID)
 	transaction := Transaction{
 		Time:     time.Now().Format(time.RFC3339),
 		Amount:   amount,
+		Balance:  balance,
 		ClientID: clientID,
 	}
-	transaction.Balance += amount
 
 	appendTransactionToFile(transaction)
 
@@ -110,6 +112,29 @@ func appendTransactionToFile(transaction Transaction) {
 	if _, err := file.WriteString(string(transactionData) + "\n"); err != nil {
 		log.Fatalf("Failed to write to account file: %v", err)
 	}
+}
+
+func calculateBalance(clientID string) int {
+
+	file, err := os.Open(dataFilePath)
+	if err != nil {
+		log.Fatalf("Failed to open account file: %v", err)
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	balance := 0
+	for scanner.Scan() {
+		var transaction Transaction
+		if err := json.Unmarshal(scanner.Bytes(), &transaction); err != nil {
+			log.Fatalf("Failed to unmarshal transaction data: %v", err)
+		}
+
+		if clientID == transaction.ClientID {
+			balance += transaction.Amount
+		}
+	}
+
+	return balance
 }
 
 func main() {
