@@ -2,3 +2,5 @@
 {"time":"2024-06-19T10:12:19+02:00","amount":88,"balance":-101,"client_id":"client1"}
 {"time":"2024-06-19T10:12:26+02:00","amount":-29,"balance":-130,"client_id":"client1"}
 {"time":"2024-06-19T10:12:28+02:00","amount":-1,"balance":-131,"client_id":"client1"}
+{"time":"2024-06-19T10:12:30+02:00","amount":54,"balance":-77,"client_id":"client1"}
+{"time":"2024-06-19T10:12:33+02:00","amount":-99,"balance":-176,"client_id":"client1"}
