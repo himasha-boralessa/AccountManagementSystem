@@ -67,9 +67,9 @@ func main() {
 	// Read the CLIENT_ID environment variable
 	clientID := os.Getenv("CLIENT_ID")
 	if clientID == "" {
-		fmt.Println("CLIENT_ID environment variable not set")
-		return
-		// clientID = "client2"
+		// fmt.Println("CLIENT_ID environment variable not set")
+		// return
+		clientID = "client2"
 	}
 
 	for {
