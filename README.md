@@ -7,6 +7,7 @@ Containerized application with Google Kubernetes Engine
  export my_cluster=cluster-1
  export zone=europe-west1-c
  export PROJECT_ID=<projectId>
+ export GOOGLE_APPLICATION_CREDENTIALS="./service-account-file.json"
 
  Create a new bucket:
  gsutil mb gs://<projectId>-bucket/
