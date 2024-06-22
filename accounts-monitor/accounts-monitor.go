@@ -1,110 +1,62 @@
 package main
 
 import (
-	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
-	"net/http"
-	"os"
-	"sync"
 
-	"cloud.google.com/go/storage"
+	"google.golang.org/api/option"
+	"google.golang.org/api/storage/v1"
 )
 
-type Transaction struct {
-	Amount   int    `json:"amount"`
-	Balance  int    `json:"balance"`
-	ClientID string `json:"client_id"`
-}
+const (
+	projectID  = "your-project-id"
+	bucketName = "your-bucket-name"
+	objectName = "your-object-name" // Name of the file/object in the bucket
+)
 
-type AccountData struct {
-	Transactions []Transaction `json:"transactions"`
-}
+var (
+	client *storage.Service
+)
 
-const dataFilePath = "/app/data/account-data.txt"
-
-// const dataFilePath = "../account-data.txt"
-
-var mu sync.Mutex
-
-func handleMonitor(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
-
+func main() {
 	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		log.Fatalf("Failed to create GCS client: %v", err)
-	}
-	defer client.Close()
-	// Specify your bucket and object (file) name
-	bucketName := "my-test-bucket"
-	objectName := "example.txt"
+
+	// Initialize Google Cloud Storage client
+	initializeGCSClient(ctx)
+
 	// Read from the object in GCS
 	data, err := readFromGCS(ctx, client, bucketName, objectName)
 	if err != nil {
 		log.Fatalf("Failed to read from GCS: %v", err)
 	}
+
 	fmt.Printf("Contents of %s:\n%s\n", objectName, string(data))
-
-	// accountData := loadAccountData()
-	// json.NewEncoder(w).Encode(accountData)
 }
 
-func loadAccountData() AccountData {
-	file, err := os.Open(dataFilePath)
+// initializeGCSClient initializes the Google Cloud Storage client
+func initializeGCSClient(ctx context.Context) {
+	var err error
+	client, err = storage.NewService(ctx, option.WithoutAuthentication())
 	if err != nil {
-		if os.IsNotExist(err) {
-			return AccountData{}
-		}
-		log.Fatalf("Failed to open account file: %v", err)
+		log.Fatalf("Failed to create storage client: %v", err)
 	}
-	defer file.Close()
-
-	var accountData AccountData
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		var transaction Transaction
-		if err := json.Unmarshal(scanner.Bytes(), &transaction); err != nil {
-			log.Fatalf("Failed to unmarshal transaction data: %v", err)
-		}
-		accountData.Transactions = append(accountData.Transactions, transaction)
-	}
-
-	if err := scanner.Err(); err != nil {
-		log.Fatalf("Failed to read account file: %v", err)
-	}
-
-	return accountData
+	log.Println("Google Cloud Storage client initialized")
 }
 
-// readFromGCS reads data from a file in GCS bucket.
-func readFromGCS(ctx context.Context, client *storage.Client, bucketName, objectName string) ([]byte, error) {
-	// Get a bucket handle
-	bucket := client.Bucket(bucketName)
-
-	// Get a reader for the object in GCS
-	obj := bucket.Object(objectName)
-	reader, err := obj.NewReader(ctx)
+// readFromGCS reads data from a file in GCS bucket
+func readFromGCS(ctx context.Context, storageService *storage.Service, bucketName, objectName string) ([]byte, error) {
+	resp, err := storageService.Objects.Get(bucketName, objectName).Context(ctx).Download()
 	if err != nil {
-		return nil, fmt.Errorf("failed to create GCS reader: %v", err)
+		return nil, fmt.Errorf("failed to download object: %v", err)
 	}
-	defer reader.Close()
+	defer resp.Body.Close()
 
-	// Read data from the object in GCS
-	data, err := reader.ReadAll()
+	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read from GCS object: %v", err)
+		return nil, fmt.Errorf("failed to read object body: %v", err)
 	}
 
 	return data, nil
-}
-
-func main() {
-	http.Handle("/", http.FileServer(http.Dir("/app/public")))
-	// http.Handle("/", http.FileServer(http.Dir("./public")))
-	http.HandleFunc("/monitor", handleMonitor)
-	log.Fatal(http.ListenAndServe(":8083", nil))
 }
