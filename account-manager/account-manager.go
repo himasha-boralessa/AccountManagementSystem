@@ -22,7 +22,7 @@ type Transaction struct {
 	ClientID string `json:"client_id"`
 }
 
-const dataFilePath = "/app/account-data.txt"
+const dataFilePath = "/app/data/account-data.txt"
 
 // const dataFilePath = "../account-data.txt"
 

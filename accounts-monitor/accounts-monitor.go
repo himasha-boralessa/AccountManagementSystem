@@ -19,7 +19,7 @@ type AccountData struct {
 	Transactions []Transaction `json:"transactions"`
 }
 
-const dataFilePath = "/app/account-data.txt"
+const dataFilePath = "/app/data/account-data.txt"
 
 // const dataFilePath = "../account-data.txt"
 
