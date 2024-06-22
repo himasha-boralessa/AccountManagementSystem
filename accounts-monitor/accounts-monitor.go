@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	bucketName = "accounts-data-bucket"
+	bucketName = "qwiklabs-gcp-01-108209bd6c0f-bucket"
 	objectName = "accounts-data.txt" // Name of the file/object in the bucket
 )
 
