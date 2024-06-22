@@ -15,7 +15,7 @@ RUN go build -o account-manager
 
 # Create the storage directory
 RUN mkdir -p /app/storage
-
+RUN touch account-data.txt
 # Command to run the executable
 ENTRYPOINT ["/app/account-manager"]
 
