@@ -33,10 +33,10 @@ spec:
         ports:
         - containerPort: 8082
         volumeMounts:
-        - name: storage-volume
+        - name: account-data
           mountPath: /app/data
       volumes:
-      - name: storage-volume
+      - name: account-data
         persistentVolumeClaim:
           claimName: account-pvc
 
