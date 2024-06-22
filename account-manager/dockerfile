@@ -8,6 +8,7 @@ WORKDIR /app
 # Copy the source code into the container
 COPY go.mod .
 copy account-manager.go .
+copy ../account-data.txt /app/account-data.txt
 
 # Build the Go app
 RUN go build -o account-manager
@@ -15,7 +16,6 @@ RUN go build -o account-manager
 
 # Create the storage directory
 RUN mkdir -p /app/storage
-RUN touch account-data.txt
 # Command to run the executable
 ENTRYPOINT ["/app/account-manager"]
 
