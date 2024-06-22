@@ -32,13 +32,13 @@ spec:
         image: gcr.io/PROJECT_ID/account-manager:latest
         ports:
         - containerPort: 8082
-        volumeMounts:
-        - name: account-data
-          mountPath: /app/data
-      volumes:
-      - name: account-data
-        persistentVolumeClaim:
-          claimName: account-pvc
+      #   volumeMounts:
+      #   - name: account-data
+      #     mountPath: /app/data
+      # volumes:
+      # - name: account-data
+      #   persistentVolumeClaim:
+      #     claimName: account-pvc
 
 ---
 apiVersion: v1
