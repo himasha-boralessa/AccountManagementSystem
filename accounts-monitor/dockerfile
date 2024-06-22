@@ -6,6 +6,8 @@ WORKDIR /app
 
 # Copy the source code into the container
 COPY go.mod .
+COPY go.sum .
+
 COPY accounts-monitor.go .
 
 COPY ./public /app/public
