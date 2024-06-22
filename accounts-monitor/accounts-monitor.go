@@ -99,8 +99,8 @@ func readFromGCS(ctx context.Context, storageService *storage.Service, bucketNam
 }
 
 func main() {
-	// http.Handle("/", http.FileServer(http.Dir("/app/public")))
-	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.Handle("/", http.FileServer(http.Dir("/app/public")))
+	// http.Handle("/", http.FileServer(http.Dir("./public")))
 	http.HandleFunc("/monitor", handleMonitor)
 	log.Fatal(http.ListenAndServe(":8083", nil))
 }
