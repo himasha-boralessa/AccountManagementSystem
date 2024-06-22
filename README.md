@@ -11,7 +11,7 @@ Containerized application with Google Kubernetes Engine
  Create a new bucket:
  gsutil mb gs://<projectId>-bucket/
  Make the bucket public:
- gsutil iam ch allUsers:objectViewer gs://<projectId>-bucket
+ gsutil iam ch allUsers:admin gs://<projectId>-bucket
 
  Push docker image to Google Container Registry (GCR)
  docker build -t gcr.io/$PROJECT_ID/account-manager:latest .
