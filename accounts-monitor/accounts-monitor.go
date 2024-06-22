@@ -2,11 +2,15 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"sync"
+
+	"cloud.google.com/go/storage"
 )
 
 type Transaction struct {
@@ -29,8 +33,24 @@ func handleMonitor(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	accountData := loadAccountData()
-	json.NewEncoder(w).Encode(accountData)
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		log.Fatalf("Failed to create GCS client: %v", err)
+	}
+	defer client.Close()
+	// Specify your bucket and object (file) name
+	bucketName := "my-test-bucket"
+	objectName := "example.txt"
+	// Read from the object in GCS
+	data, err := readFromGCS(ctx, client, bucketName, objectName)
+	if err != nil {
+		log.Fatalf("Failed to read from GCS: %v", err)
+	}
+	fmt.Printf("Contents of %s:\n%s\n", objectName, string(data))
+
+	// accountData := loadAccountData()
+	// json.NewEncoder(w).Encode(accountData)
 }
 
 func loadAccountData() AccountData {
@@ -58,6 +78,28 @@ func loadAccountData() AccountData {
 	}
 
 	return accountData
+}
+
+// readFromGCS reads data from a file in GCS bucket.
+func readFromGCS(ctx context.Context, client *storage.Client, bucketName, objectName string) ([]byte, error) {
+	// Get a bucket handle
+	bucket := client.Bucket(bucketName)
+
+	// Get a reader for the object in GCS
+	obj := bucket.Object(objectName)
+	reader, err := obj.NewReader(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create GCS reader: %v", err)
+	}
+	defer reader.Close()
+
+	// Read data from the object in GCS
+	data, err := reader.ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read from GCS object: %v", err)
+	}
+
+	return data, nil
 }
 
 func main() {
