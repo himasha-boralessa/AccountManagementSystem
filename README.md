@@ -22,6 +22,8 @@ Containerized application with Google Kubernetes Engine
  gcloud container clusters get-credentials $my_cluster --zone $zone  //to allow authentication
  kubectl cluster-info  //the cluster information
 
+kubectl apply -f PersistentVolume.yaml
+kubectl apply -f PersistentVolumeClaim.yaml
 sed "s/PROJECT_ID/${PROJECT_ID}/g" client-manager-deployment.yml | kubectl apply -f -
 sed "s/PROJECT_ID/${PROJECT_ID}/g" accounts-monitor-deployment.yml | kubectl apply -f -
 
