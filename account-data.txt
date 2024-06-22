@@ -27,3 +27,5 @@
 {"time":"2024-06-19T16:16:26+02:00","amount":38,"balance":-72,"client_id":"client1"}
 {"time":"2024-06-19T16:16:28+02:00","amount":-57,"balance":-34,"client_id":"client1"}
 {"time":"2024-06-19T16:16:36+02:00","amount":54,"balance":-91,"client_id":"client1"}
+{"time":"2024-06-19T16:16:43+02:00","amount":-43,"balance":-37,"client_id":"client1"}
+{"time":"2024-06-19T16:16:51+02:00","amount":25,"balance":-80,"client_id":"client1"}
