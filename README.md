@@ -22,7 +22,7 @@ Containerized application with Google Kubernetes Engine
  gcloud container clusters get-credentials $my_cluster --zone $zone  //to allow authentication
  kubectl cluster-info  //the cluster information
 
-sed "s/PROJECT_ID/${PROJECT_ID}/g" deployment.yml | kubectl apply -f -
+sed "s/PROJECT_ID/${PROJECT_ID}/g" client-manager-deployment.yml | kubectl apply -f -
 sed "s/PROJECT_ID/${PROJECT_ID}/g" accounts-monitor-deployment.yml | kubectl apply -f -
 
 kubectl describe pod <podName> // view the complete details of the Pod
