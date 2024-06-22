@@ -32,17 +32,7 @@ spec:
         image: gcr.io/PROJECT_ID/account-manager:latest
         ports:
         - containerPort: 8082
-      # Uncomment and adjust the following lines if you need to mount volumes
-      # volumeMounts:
-      # - mountPath: /app/storage # Mount path in the container
-      #   name: account-storage
-      # volumes:
-      # - name: account-storage
-      #   persistentVolumeClaim:
-      #     claimName: account-pvc  # Name of the PVC
-
 ---
-# account-system-service.yaml
 apiVersion: v1
 kind: Service
 metadata:

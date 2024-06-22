@@ -1,40 +1,3 @@
-// package main
-
-// import (
-// 	"fmt"
-// 	"log"
-// 	"net/http"
-// 	"strconv"
-// 	"sync"
-// 	"time"
-// )
-
-// var (
-// 	balance int
-// 	mu      sync.Mutex
-// )
-
-// func handleTransaction(w http.ResponseWriter, r *http.Request) {
-// 	amountStr := r.URL.Query().Get("amount")
-// 	amount, err := strconv.Atoi(amountStr)
-// 	if err != nil {
-// 		http.Error(w, "Invalid amount", http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	mu.Lock()
-// 	defer mu.Unlock()
-// 	balance += amount
-
-// 	log.Printf("%s: Transaction of %d, new balance: %d\n", time.Now().Format(time.RFC3339), amount, balance)
-// 	fmt.Fprintf(w, "Transaction successful, new balance: %d", balance)
-// }
-
-// func main() {
-// 	http.HandleFunc("/transaction", handleTransaction)
-// 	log.Fatal(http.ListenAndServe(":8082", nil))
-// }
-
 package main
 
 import (
@@ -50,8 +13,6 @@ import (
 
 var (
 	mu sync.Mutex
-	// balance1 int
-	// balance2 int
 )
 
 type Transaction struct {
@@ -61,8 +22,9 @@ type Transaction struct {
 	ClientID string `json:"client_id"`
 }
 
-// const dataFilePath = "/app/account-data/account.txt"
-const dataFilePath = "../account-data.txt"
+const dataFilePath = "/app/account-data.txt"
+
+// const dataFilePath = "../account-data.txt"
 
 func handleTransaction(w http.ResponseWriter, r *http.Request) {
 	amountStr := r.URL.Query().Get("amount")
@@ -90,22 +52,9 @@ func handleTransaction(w http.ResponseWriter, r *http.Request) {
 		ClientID: clientID,
 	}
 
-	// if clientID == "client1" {
-	// 	balance1 += transaction.Amount
-	// 	transaction.Balance = balance1
-	// }
-	// if clientID == "client2" {
-	// 	balance2 += transaction.Amount
-	// 	transaction.Balance = balance2
-	// }
-
 	appendTransactionToFile(transaction)
 
 	log.Printf("Transaction of %d, new balance: %d, Client-ID: %s\n", amount, transaction.Balance, clientID)
-	// json.NewEncoder(w).Encode(map[string]interface{}{
-	// 	"balance":     balance,
-	// 	"transaction": transaction,
-	// })
 }
 
 func appendTransactionToFile(transaction Transaction) {
@@ -149,8 +98,8 @@ func calculateBalance(clientID string) int {
 }
 
 func main() {
-	// os.MkdirAll("/app/account-data", os.ModePerm) // Ensure the directory exists
-	os.MkdirAll("../", os.ModePerm) // Ensure the parent directory exists
+	os.MkdirAll("/app", os.ModePerm) // Ensure the directory exists
+	// os.MkdirAll("../", os.ModePerm)  // Ensure the parent directory exists
 	http.HandleFunc("/transaction", handleTransaction)
 	log.Fatal(http.ListenAndServe(":8082", nil))
 }

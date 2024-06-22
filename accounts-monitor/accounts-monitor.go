@@ -1,50 +1,3 @@
-// package main
-
-// import (
-// 	"encoding/json"
-// 	"log"
-// 	"net/http"
-// 	"sync"
-// )
-
-// type Transaction struct {
-// 	Time   string `json:"time"`
-// 	Amount int    `json:"amount"`
-// }
-
-// type Account struct {
-// 	Balance      int           `json:"balance"`
-// 	Transactions []Transaction `json:"transactions"`
-// }
-
-// var (
-// 	mu sync.Mutex
-// )
-
-// func getTransactions(w http.ResponseWriter, r *http.Request) {
-// 	resp, err := http.Get("http://account-system:8082/transactions")
-// 	if err != nil {
-// 		http.Error(w, "Failed to fetch transactions", http.StatusInternalServerError)
-// 		return
-// 	}
-// 	defer resp.Body.Close()
-
-// 	var account Account
-// 	if err := json.NewDecoder(resp.Body).Decode(&account); err != nil {
-// 		http.Error(w, "Failed to decode transactions", http.StatusInternalServerError)
-// 		return
-// 	}
-
-// 	mu.Lock()
-// 	defer mu.Unlock()
-// 	json.NewEncoder(w).Encode(account)
-// }
-
-// func main() {
-// 	http.HandleFunc("/transactions", getTransactions)
-// 	log.Fatal(http.ListenAndServe(":8083", nil))
-// }
-
 package main
 
 import (
@@ -66,8 +19,9 @@ type AccountData struct {
 	Transactions []Transaction `json:"transactions"`
 }
 
-// const dataFilePath = "/app/account-data/account.txt"
-const dataFilePath = "../account-data.txt"
+const dataFilePath = "/app/account-data.txt"
+
+// const dataFilePath = "../account-data.txt"
 
 var mu sync.Mutex
 
@@ -107,8 +61,8 @@ func loadAccountData() AccountData {
 }
 
 func main() {
-	// http.Handle("/", http.FileServer(http.Dir("/app/public")))
-	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.Handle("/", http.FileServer(http.Dir("/app/public")))
+	// http.Handle("/", http.FileServer(http.Dir("./public")))
 	http.HandleFunc("/monitor", handleMonitor)
 	log.Fatal(http.ListenAndServe(":8083", nil))
 }
