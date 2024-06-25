@@ -8,6 +8,8 @@ import (
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
+	// "google.golang.org/api/option"
+	// "google.golang.org/api/storage/v1"
 )
 
 const (
@@ -42,7 +44,7 @@ func initializeGCSClient() {
 	ctx = context.Background()
 
 	// Use service account key for authentication
-	client, err = storage.NewClient(ctx, option.WithCredentialsFile("../service-account-file.json"))
+	client, err = storage.NewClient(ctx, option.WithoutAuthentication())
 	if err != nil {
 		log.Fatalf("Failed to create storage client: %v", err)
 	}
