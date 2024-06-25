@@ -20,7 +20,7 @@ COPY . .
 ENV GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-file.json"
 
 # Copy the service account key into the container
-COPY service-account-file.json /app/service-account-file.json
+COPY ../service-account-file.json /app/service-account-file.json
 
 
 # Create the storage directory

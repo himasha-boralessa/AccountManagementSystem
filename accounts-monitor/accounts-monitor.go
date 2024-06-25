@@ -60,7 +60,7 @@ func handleMonitor(w http.ResponseWriter, r *http.Request) {
 // initializeGCSClient initializes the Google Cloud Storage client
 func initializeGCSClient(ctx context.Context) {
 	var err error
-	client, err = storage.NewService(ctx, option.WithoutAuthentication())
+	client, err = storage.NewService(ctx, option.WithCredentialsFile("../service-account-file.json"))
 	if err != nil {
 		log.Fatalf("Failed to create storage client: %v", err)
 	}

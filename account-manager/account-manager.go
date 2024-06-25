@@ -42,7 +42,7 @@ func initializeGCSClient() {
 	ctx = context.Background()
 
 	// Use service account key for authentication
-	client, err = storage.NewClient(ctx, option.WithCredentialsFile("./service-account-file.json"))
+	client, err = storage.NewClient(ctx, option.WithCredentialsFile("../service-account-file.json"))
 	if err != nil {
 		log.Fatalf("Failed to create storage client: %v", err)
 	}
