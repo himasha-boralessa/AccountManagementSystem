@@ -13,6 +13,15 @@ copy account-manager.go .
 # Build the Go app
 RUN go build -o account-manager
 
+# Copy the source code into the container
+COPY . .
+
+# Set the environment variable for the service account key
+ENV GOOGLE_APPLICATION_CREDENTIALS="/app/service-account-file.json"
+
+# Copy the service account key into the container
+COPY service-account-file.json /app/service-account-file.json
+
 
 # Create the storage directory
 # RUN mkdir -p /app/storage
