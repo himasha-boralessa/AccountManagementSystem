@@ -7,11 +7,12 @@ Containerized application with Google Kubernetes Engine
  export my_cluster=cluster-1
  export zone=europe-west1-c
  export PROJECT_ID=<projectId>
+ export GOOGLE_APPLICATION_CREDENTIALS="./service-account-file.json"
 
  Create a new bucket:
  gsutil mb gs://<projectId>-bucket/
  Make the bucket public:
- gsutil iam ch allUsers:objectViewer gs://<projectId>-bucket
+ gsutil iam ch allUsers:admin gs://<projectId>-bucket
 
  Push docker image to Google Container Registry (GCR)
  docker build -t gcr.io/$PROJECT_ID/account-manager:latest .
