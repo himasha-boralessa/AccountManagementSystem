@@ -29,7 +29,11 @@ var (
 )
 
 const (
+<<<<<<< HEAD
 	bucketName = "qwiklabs-gcp-02-7e208e1db0ca-bucket"
+=======
+	bucketName = "qwiklabs-gcp-00-8af698a525cb-bucket"
+>>>>>>> e23adfca5e521ed6b6658d40c6659aa64eae75a2
 	objectName = "data.txt"
 )
 
@@ -104,6 +108,7 @@ func appendToGCS(ctx context.Context, client *storage.Client, bucketName, object
 			return fmt.Errorf("failed to read object body: %v", err)
 		}
 		content = string(body)
+<<<<<<< HEAD
 	}
 
 	// Marshal transaction to JSON
@@ -121,6 +126,31 @@ func appendToGCS(ctx context.Context, client *storage.Client, bucketName, object
 
 	_, err = w.Write([]byte(content))
 	if err != nil {
+=======
+		// log.Println("Read existing content from GCS:", content)
+	}
+
+	// // Append new data
+	// newData := fmt.Sprintf("{\"time\":\"%s\",\"amount\":%d,\"client_id\":\"%s\"}\n", time.Now().Format(time.RFC3339), amount, clientID)
+	// content += newData
+
+	// Marshal transaction to JSON
+	// transactionData, err := json.Marshal(transaction)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to marshal transaction data: %v", err)
+	// }
+
+	// Append new transaction data
+	newData := fmt.Sprintf("{\"amount\":\"%d\",\"balance\":%d,\"client_id\":\"%s\"}\n", transaction.Amount, transaction.Balance, transaction.ClientID)
+	content += string(newData) + "\n"
+
+	// Write back to GCS
+	w := obj.NewWriter(ctx)
+	defer w.Close()
+
+	_, err = w.Write([]byte(content))
+	if err != nil {
+>>>>>>> e23adfca5e521ed6b6658d40c6659aa64eae75a2
 		return fmt.Errorf("failed to write to GCS: %v", err)
 	}
 
