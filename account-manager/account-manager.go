@@ -28,19 +28,6 @@ var (
 	mu       sync.Mutex
 )
 
-type Transaction struct {
-	Time     string `json:"time"`
-	Amount   int    `json:"amount"`
-	Balance  int    `json:"balance"`
-	ClientID string `json:"client_id"`
-}
-
-var (
-	balance1 int
-	balance2 int
-	mu       sync.Mutex
-)
-
 const (
 	bucketName = "qwiklabs-gcp-02-7e208e1db0ca-bucket"
 	objectName = "data.txt"
