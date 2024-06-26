@@ -3,105 +3,130 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
+	"net/http"
+	"strconv"
+	"sync"
+	"time"
 
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/option"
-	// "google.golang.org/api/option"
-	// "google.golang.org/api/storage/v1"
+)
+
+type Transaction struct {
+	Time     string `json:"time"`
+	Amount   int    `json:"amount"`
+	Balance  int    `json:"balance"`
+	ClientID string `json:"client_id"`
+}
+
+var (
+	balance1 int
+	balance2 int
+	mu       sync.Mutex
 )
 
 const (
-	bucketName = "qwiklabs-gcp-01-afc66f30517d-bucket"
-	objectName = "accounts-data.txt" // Name of the file/object in the bucket
-)
-
-var (
-	ctx    context.Context
-	client *storage.Client
+	bucketName = "qwiklabs-gcp-00-8af698a525cb-bucket"
+	objectName = "data.txt"
 )
 
 func main() {
-	// Initialize Google Cloud Storage client
-	initializeGCSClient()
-
-	// Example data to append
-	dataToAppend := `{"time":"2024-06-19T07:57:01+02:00","amount":8888888888,"balance":647,"client_id":"client1"}`
-
-	// Append data to the text file in the bucket
-	err := appendToGCS(ctx, client, bucketName, objectName, []byte(dataToAppend))
-	if err != nil {
-		log.Fatalf("Failed to append to GCS: %v", err)
-	}
-
-	fmt.Printf("Data appended to %s in bucket %s\n", objectName, bucketName)
+	http.HandleFunc("/transaction", handleTransaction)
+	log.Fatal(http.ListenAndServe(":8082", nil))
 }
 
-// initializeGCSClient initializes the Google Cloud Storage client
-func initializeGCSClient() {
-	var err error
-	ctx = context.Background()
-
-	// Use service account key for authentication
-	client, err = storage.NewClient(ctx, option.WithoutAuthentication())
+func handleTransaction(w http.ResponseWriter, r *http.Request) {
+	amountStr := r.URL.Query().Get("amount")
+	amount, err := strconv.Atoi(amountStr)
 	if err != nil {
-		log.Fatalf("Failed to create storage client: %v", err)
+		http.Error(w, "Invalid amount", http.StatusBadRequest)
+		return
 	}
-	log.Println("Google Cloud Storage client initialized")
+
+	// Retrieve Client-ID from header
+	clientID := r.Header.Get("Client-ID")
+	if clientID == "" {
+		http.Error(w, "clientid query parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	mu.Lock()
+	defer mu.Unlock()
+
+	transaction := Transaction{
+		Time:     time.Now().Format(time.RFC3339),
+		Amount:   amount,
+		ClientID: clientID,
+	}
+
+	if clientID == "client1" {
+		balance1 += transaction.Amount
+		transaction.Balance = balance1
+	} else if clientID == "client2" {
+		balance2 += transaction.Amount
+		transaction.Balance = balance2
+	}
+
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx, option.WithoutAuthentication())
+	if err != nil {
+		http.Error(w, "Failed to create storage client", http.StatusInternalServerError)
+		return
+	}
+
+	err = appendToGCS(ctx, client, bucketName, objectName, transaction)
+	if err != nil {
+		http.Error(w, "Failed to write to GCS", http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	log.Printf("Transaction of %d, new balance: %d, Client-ID: %s\n", transaction.Amount, transaction.Balance, transaction.ClientID)
 }
 
-// appendToGCS appends data to a file in GCS bucket
-func appendToGCS(ctx context.Context, storageClient *storage.Client, bucketName, objectName string, data []byte) error {
-	// Read existing data from the object
-	existingData, err := readFromGCS(ctx, storageClient, bucketName, objectName)
-	if err != nil {
-		// If the file does not exist, create it
-		if err == storage.ErrObjectNotExist {
-			existingData = []byte{}
-		} else {
-			return fmt.Errorf("failed to read existing data: %v", err)
+func appendToGCS(ctx context.Context, client *storage.Client, bucketName, objectName string, transaction Transaction) error {
+	bucket := client.Bucket(bucketName)
+	obj := bucket.Object(objectName)
+
+	// Read existing content
+	r, err := obj.NewReader(ctx)
+	if err != nil && err != storage.ErrObjectNotExist {
+		return fmt.Errorf("failed to read object: %v", err)
+	}
+	var content string
+	if err == nil {
+		defer r.Close()
+		body, err := io.ReadAll(r)
+		if err != nil {
+			return fmt.Errorf("failed to read object body: %v", err)
 		}
+		content = string(body)
+		// log.Println("Read existing content from GCS:", content)
 	}
 
-	// Append the new data to the existing data
-	updatedData := append(existingData, data...)
+	// // Append new data
+	// newData := fmt.Sprintf("{\"time\":\"%s\",\"amount\":%d,\"client_id\":\"%s\"}\n", time.Now().Format(time.RFC3339), amount, clientID)
+	// content += newData
 
-	// Write the updated data back to the object in GCS
-	return writeToGCS(ctx, storageClient, bucketName, objectName, updatedData)
-}
+	// Marshal transaction to JSON
+	// transactionData, err := json.Marshal(transaction)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to marshal transaction data: %v", err)
+	// }
 
-// readFromGCS reads data from a file in GCS bucket
-func readFromGCS(ctx context.Context, storageClient *storage.Client, bucketName, objectName string) ([]byte, error) {
-	// Open a reader for the object in GCS
-	rc, err := storageClient.Bucket(bucketName).Object(objectName).NewReader(ctx)
+	// Append new transaction data
+	newData := fmt.Sprintf("{\"amount\":\"%d\",\"balance\":%d,\"client_id\":\"%s\"}\n", transaction.Amount, transaction.Balance, transaction.ClientID)
+	content += string(newData) + "\n"
+
+	// Write back to GCS
+	w := obj.NewWriter(ctx)
+	defer w.Close()
+
+	_, err = w.Write([]byte(content))
 	if err != nil {
-		return nil, fmt.Errorf("failed to create reader: %v", err)
-	}
-	defer rc.Close()
-
-	// Read the object data
-	data, err := ioutil.ReadAll(rc)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read object data: %v", err)
-	}
-
-	return data, nil
-}
-
-// writeToGCS writes data to a file in GCS bucket
-func writeToGCS(ctx context.Context, storageClient *storage.Client, bucketName, objectName string, data []byte) error {
-	// Open a writer for the object in GCS
-	wc := storageClient.Bucket(bucketName).Object(objectName).NewWriter(ctx)
-
-	// Write data to the object
-	if _, err := wc.Write(data); err != nil {
-		return fmt.Errorf("failed to write object: %v", err)
-	}
-
-	// Close the writer to flush the data to GCS
-	if err := wc.Close(); err != nil {
-		return fmt.Errorf("failed to close writer: %v", err)
+		return fmt.Errorf("failed to write to GCS: %v", err)
 	}
 
 	return nil
