@@ -15,8 +15,6 @@ Containerized application with Google Kubernetes Engine
  touch accounts-data.txt
  gsutil cp accounts-data.txt gs://$PROJECT_ID-bucket/
 
- gsutil iam ch allUsers:objectAdmin gs://$PROJECT_ID-bucket
-
  Create a new file :
  echo "" | gsutil cp - gs://$PROJECT_ID-bucket/account-data.txt 
 
