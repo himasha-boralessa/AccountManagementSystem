@@ -12,7 +12,7 @@ Containerized application with Google Kubernetes Engine
  gsutil mb gs://$PROJECT_ID-bucket/
  Make the bucket public:
  gsutil iam ch allUsers:objectAdmin gs://$PROJECT_ID-bucket
- touch data.txt
+ touch accounts-data.txt
  gsutil cp accounts-data.txt gs://$PROJECT_ID-bucket/ 
 
  Push docker image to Google Container Registry (GCR)
