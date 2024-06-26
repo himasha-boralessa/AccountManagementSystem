@@ -13,7 +13,12 @@ Containerized application with Google Kubernetes Engine
  Make the bucket public:
  gsutil iam ch allUsers:objectAdmin gs://$PROJECT_ID-bucket
  touch accounts-data.txt
- gsutil cp accounts-data.txt gs://$PROJECT_ID-bucket/ 
+ gsutil cp accounts-data.txt gs://$PROJECT_ID-bucket/
+
+ gsutil iam ch allUsers:objectAdmin gs://$PROJECT_ID-bucket
+
+ Create a new file :
+ echo "" | gsutil cp - gs://$PROJECT_ID-bucket/account-data.txt 
 
  Push docker image to Google Container Registry (GCR)
  docker build -t gcr.io/$PROJECT_ID/account-manager:latest .
