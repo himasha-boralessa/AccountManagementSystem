@@ -1,24 +1,17 @@
-
 # Use the official Golang image as the base image for the build stage
-FROM golang:1.20
+FROM golang:1.22.1 
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
 # Copy the source code into the container
 COPY go.mod .
-copy account-manager.go .
-# copy ../account-data.txt /app/account-data.txt
+COPY go.sum .
+
+COPY account-manager.go .
 
 # Build the Go app
-RUN go build -o account-manager
-
-# Copy the source code into the container
-COPY . .
-
-# Create the storage directory
-# RUN mkdir -p /app/storage
-# RUN touch account-data.txt
+RUN go build -o account-manager .
 
 # Command to run the executable
 ENTRYPOINT ["/app/account-manager"]

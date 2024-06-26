@@ -15,6 +15,7 @@ func main() {
 	if clientID == "" {
 		fmt.Println("CLIENT_ID environment variable not set")
 		return
+		// clientID = "client1"
 	}
 
 	for {

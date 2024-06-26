@@ -14,15 +14,17 @@ import (
 )
 
 const (
-	bucketName = "qwiklabs-gcp-01-afc66f30517d-bucket"
-	objectName = "accounts-data.txt" // Name of the file/object in the bucket
+	bucketName = "qwiklabs-gcp-02-7e208e1db0ca-bucket"
+	objectName = "data.txt"
 )
 
 var (
 	client *storage.Service
+	mu     sync.Mutex
 )
 
 type Transaction struct {
+	Time     string `json:"time"`
 	Amount   int    `json:"amount"`
 	Balance  int    `json:"balance"`
 	ClientID string `json:"client_id"`
@@ -32,29 +34,29 @@ type AccountData struct {
 	Transactions []Transaction `json:"transactions"`
 }
 
-var mu sync.Mutex
+func main() {
+	http.HandleFunc("/monitor", handleMonitor)
+	log.Fatal(http.ListenAndServe(":8083", nil))
+}
 
 func handleMonitor(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
 	ctx := context.Background()
-
-	// Initialize Google Cloud Storage client
 	initializeGCSClient(ctx)
 
-	// Read from the object in GCS
-	var accountData AccountData
 	accountData, err := readFromGCS(ctx, client, bucketName, objectName)
 	if err != nil {
+		http.Error(w, "Failed to read from GCS", http.StatusInternalServerError)
 		log.Fatalf("Failed to read from GCS: %v", err)
+		return
 	}
 
-	// // Print the parsed data
-	// fmt.Printf("Name: %s\nAge: %d\nEmail: %s\n", transaction.ClientID, transaction.Amount, transaction.Balance)
-
-	// fmt.Printf("Contents of %s:\n%s\n", objectName, string(data))
-	json.NewEncoder(w).Encode(accountData)
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(accountData); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 }
 
 // initializeGCSClient initializes the Google Cloud Storage client
@@ -69,20 +71,22 @@ func initializeGCSClient(ctx context.Context) {
 
 // readFromGCS reads data from a file in GCS bucket
 func readFromGCS(ctx context.Context, storageService *storage.Service, bucketName, objectName string) (AccountData, error) {
-
 	var accountData AccountData
+
 	resp, err := storageService.Objects.Get(bucketName, objectName).Context(ctx).Download()
 	if err != nil {
 		return accountData, fmt.Errorf("failed to download object: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// data, err := ioutil.ReadAll(resp.Body)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("failed to read object body: %v", err)
-	// }
 	scanner := bufio.NewScanner(resp.Body)
 	for scanner.Scan() {
+		line := scanner.Text()
+
+		// Skip empty lines
+		if line == "" {
+			continue
+		}
 		var transaction Transaction
 		if err := json.Unmarshal(scanner.Bytes(), &transaction); err != nil {
 			log.Fatalf("Failed to unmarshal transaction data: %v", err)
@@ -95,12 +99,4 @@ func readFromGCS(ctx context.Context, storageService *storage.Service, bucketNam
 	}
 
 	return accountData, nil
-	// return data, nil
-}
-
-func main() {
-	http.Handle("/", http.FileServer(http.Dir("/app/public")))
-	// http.Handle("/", http.FileServer(http.Dir("./public")))
-	http.HandleFunc("/monitor", handleMonitor)
-	log.Fatal(http.ListenAndServe(":8083", nil))
 }
