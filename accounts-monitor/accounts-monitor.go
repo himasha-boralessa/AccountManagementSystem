@@ -35,6 +35,7 @@ type AccountData struct {
 }
 
 func main() {
+	http.Handle("/", http.FileServer(http.Dir("/app/public")))
 	http.HandleFunc("/monitor", handleMonitor)
 	log.Fatal(http.ListenAndServe(":8083", nil))
 }
